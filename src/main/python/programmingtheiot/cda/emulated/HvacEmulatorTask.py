@@ -30,6 +30,11 @@ class HvacEmulatorTask(BaseActuatorSimTask):
 			name = ConfigConst.HVAC_ACTUATOR_NAME, \
 			typeID = ConfigConst.HVAC_ACTUATOR_TYPE, \
 			simpleName = "HVAC")
+		enableEmulation = \
+			ConfigUtil().getBoolean( \
+				ConfigConst.CONSTRAINED_DEVICE, ConfigConst.ENABLE_EMULATOR_KEY)
+
+		self.sh = SenseHAT(emulate = enableEmulation)
 
 	def _activateActuator(self, val: float = ConfigConst.DEFAULT_VAL, stateData: str = None) -> int:
 		if self.sh.screen:

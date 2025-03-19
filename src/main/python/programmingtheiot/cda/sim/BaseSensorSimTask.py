@@ -53,8 +53,8 @@ class BaseSensorSimTask():
 			sensorVal=self.dataSet.getDataEntry(index=self.dataSetIndex)
 			self.dataSetIndex=self.dataSetIndex+1
 
-		if self.dataSetIndex>=self.dataSet.getDataEntryCount()-1:
-			self.dataSetIndex=0
+			if self.dataSetIndex>=self.dataSet.getDataEntryCount()-1:
+				self.dataSetIndex=0
 
 		sensorData.setValue(sensorVal)
 
