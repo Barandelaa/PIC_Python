@@ -23,12 +23,14 @@ class SystemPerformanceData(BaseIotData):
 		
 		self.cpuUtil = ConfigConst.DEFAULT_VAL
 		self.memUtil = ConfigConst.DEFAULT_VAL
+		self.diskUtil = ConfigConst.DEFAULT_VAL
+
 	
 	def getCpuUtilization(self):
 		return self.cpuUtil
 	
 	def getDiskUtilization(self):
-		pass
+		return self.diskUtil
 	
 	def getMemoryUtilization(self):
 		return self.memUtil
@@ -38,7 +40,8 @@ class SystemPerformanceData(BaseIotData):
 		self.updateTimeStamp()
 	
 	def setDiskUtilization(self, diskUtil):
-		pass
+		self.diskUtil = diskUtil
+		self.updateTimeStamp()
 	
 	def setMemoryUtilization(self, memUtil):
 		self.memUtil = memUtil
@@ -48,3 +51,4 @@ class SystemPerformanceData(BaseIotData):
 		if data and isinstance(data, SystemPerformanceData):
 			self.cpuUtil = data.getCpuUtilization()
 			self.memUtil = data.getMemoryUtilization()
+			self.diskUtil = data.getDiskUtilization()

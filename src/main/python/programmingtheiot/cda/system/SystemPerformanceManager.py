@@ -54,7 +54,7 @@ class SystemPerformanceManager(object):
 		self.cpuUtilPct=self.cpuUtilTask.getTelemetryValue()
 		self.memUtilPct=self.memUtilTask.getTelemetryValue()
 
-		logging.debug('CPU utilization is %s percent, and memory utilization is %s percent.',str(cpuUtilPct),str(memUtilPct))
+		logging.debug('CPU utilization is %s percent, and memory utilization is %s percent.',str(self.cpuUtilPct),str(self.memUtilPct))
 
 		sysPerfData=SystemPerformanceData()
 		sysPerfData.setLocationID(self.locationID)
