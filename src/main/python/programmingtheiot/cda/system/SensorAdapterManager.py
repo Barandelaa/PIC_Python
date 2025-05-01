@@ -62,10 +62,6 @@ class SensorAdapterManager(object):
 		# see PIOT-CDA-03-006 description for thoughts on the next line of code
 		self._initEnvironmentalSensorTasks()
 
-		tempModule = import_module('programmingtheiot.cda.emulated.TemperatureSensorEmulatorTask', 'TemperatureSensorEmulatorTask')
-		teClazz = getattr(tempModule, 'TemperatureSensorEmulatorTask')
-		self.tempAdapter = teClazz()
-
 		
 
 	def handleTelemetry(self):
@@ -162,3 +158,5 @@ class SensorAdapterManager(object):
 			teModule = import_module('programmingtheiot.cda.emulated.TemperatureSensorEmulatorTask', 'TemperatureSensorEmulatorTask')
 			teClazz = getattr(teModule, 'TemperatureSensorEmulatorTask')
 			self.tempAdapter = teClazz()
+		
+	
