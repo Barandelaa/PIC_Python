@@ -136,23 +136,13 @@ class DeviceDataManager(IDataMessageListener):
 		@return boolean
 		"""
 		if data:
-			logging.debug("Incoming actuator response received (from actuator manager): " + str(data))
+			logging.info("Processing actuator command message.")
 
-			# store the data in the cache
-			self.actuatorResponseCache[data.getName()] = data
-
-			# convert ActuatorData to JSON and get the msg resource
-			actuatorMsg = DataUtil().actuatorDataToJson(data)
-			resourceName = ResourceNameEnum.CDA_ACTUATOR_RESPONSE_RESOURCE
-
-			# delegate to the transmit function any potential upstream comm's
-			self._handleUpstreamTransmission(resource = resourceName, msg = actuatorMsg)
-
-			return True
+			# TODO: add further validation before sending the command
+			return self.actuatorAdapterMgr.sendActuatorCommand(data)
 		else:
-			logging.warning("Incoming actuator response is invalid (null). Ignoring.")
-
-			return False
+			logging.warning("Received invalid ActuatorData command message. Ignoring.")
+			return None
 	
 	def handleActuatorCommandResponse(self, data: ActuatorData) -> bool:
 		"""
@@ -177,20 +167,22 @@ class DeviceDataManager(IDataMessageListener):
 		pass
 	
 	def handleSensorMessage(self, data: SensorData) -> bool:
-		"""
-		This callback method will be invoked by the sensor manager that just processed
-		a new sensor reading, which creates a new SensorData instance that will be
-		passed to this method.
-		
-		@param data The incoming SensorData message.
-		@return boolean
-		"""
 		if data:
-			logging.debug("Incoming sensor data received (from sensor manager): " + str(data))
+			logging.info("Incoming sensor data received (from sensor manager): " + str(data))
+
+			# TODO: Optionally, implement `_handleSensorDataAnalysis()` to handle internal analytics
 			self._handleSensorDataAnalysis(data)
+
+			# Convert the `SensorData` instance to JSON
+			jsonData = DataUtil().sensorDataToJson(data = data)
+
+			# Pass the resource and newly generated JSON data to `_handleUpstreamTransmission()`
+			self._handleUpstreamTransmission(resource = ResourceNameEnum.CDA_SENSOR_MSG_RESOURCE, msg = jsonData)
+
 			return True
 		else:
 			logging.warning("Incoming sensor data is invalid (null). Ignoring.")
+
 			return False
 	
 	def handleSystemPerformanceMessage(self, data: SystemPerformanceData) -> bool:
@@ -284,11 +276,19 @@ class DeviceDataManager(IDataMessageListener):
 			# task implementations, and not this function
 			self.handleActuatorCommandMessage(ad)
 		
-	def _handleUpstreamTransmission(self, resourceName: ResourceNameEnum, msg: str):
-		"""
-		Call this from handleActuatorCommandResponse(), handlesensorMessage(), and handleSystemPerformanceMessage()
-		to determine if the message should be sent upstream. Steps to take:
-		1) Check connection: Is there a client connection configured (and valid) to a remote MQTT or CoAP server?
-		2) Act on msg: If # 1 is true, send message upstream using one (or both) client connections.
-		"""
-		pass
+	def _handleUpstreamTransmission(self, resource = None, msg: str = None):
+		logging.info("Upstream transmission invoked. Checking comm's integration.")
+
+		# NOTE: If using MQTT, the following will attempt to publish the message to the broker
+		if self.mqttClient:
+			if self.mqttClient.publishMessage(resource = resource, msg = msg):
+				logging.debug("Published incoming data to resource (MQTT): %s", str(resource))
+			else:
+				logging.warning("Failed to publish incoming data to resource (MQTT): %s", str(resource))
+
+		# NOTE: If using CoAP, the following will attempt to PUT the message to the server
+		if self.coapClient:
+			if self.coapClient.sendPutRequest(resource = resource, payload = msg):
+				logging.debug("Put incoming message data to resource (CoAP): %s", str(resource))
+			else:
+				logging.warning("Failed to put incoming message data to resource (CoAP): %s", str(resource))

@@ -51,10 +51,9 @@ class IDataMessageListener():
 	def handleActuatorCommandMessage(self, data: ActuatorData) -> ActuatorData:
 		"""
 		Callback function to handle an actuator command message packaged as a ActuatorData object.
-		
+
 		@param data The ActuatorData message received.
-		@return ActuatorData An ActuatorData message that contains the same content as 'data',
-		but with the response flag set to True.
+		@return bool True on success; False otherwise.
 		"""
 		pass
 	
