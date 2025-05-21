@@ -27,6 +27,7 @@ class MqttClientConnector(IPubSubClient):
 	def __init__(self, clientID: str = None):
 		self.config = ConfigUtil()
 		self.dataMsgListener = None
+		self.clientID = clientID
 
 		self.host = \
 			self.config.getProperty( \
