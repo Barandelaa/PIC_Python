@@ -19,6 +19,7 @@ from programmingtheiot.data.ActuatorData import ActuatorData
 
 from programmingtheiot.cda.sim.HvacActuatorSimTask import HvacActuatorSimTask
 from programmingtheiot.cda.sim.HumidifierActuatorSimTask import HumidifierActuatorSimTask
+from programmingtheiot.cda.sim.AlarmActuatorSimTask import AlarmActuatorSimTask
 
 class ActuatorAdapterManager(object):
 	"""
@@ -47,6 +48,7 @@ class ActuatorAdapterManager(object):
 		self.humidifierActuator = None
 		self.hvacActuator       = None
 		self.ledDisplayActuator = None
+		self.alarmAdapter       = None
 
 		# see PIOT-CDA-03-007 description for thoughts on the next line of code
 		self._initEnvironmentalActuationTasks()
@@ -54,6 +56,8 @@ class ActuatorAdapterManager(object):
 		hvacModule=import_module('programmingtheiot.cda.emulated.HvacEmulatorTask','HvacEmulatorTask')
 		hveClazz=getattr(hvacModule ,'HvacEmulatorTask')
 		self.hvacAdapter=hveClazz()
+
+		self.alarmAdapter = AlarmActuatorSimTask()
 
 	def sendActuatorCommand(self, data: ActuatorData) -> bool:
 		pass
@@ -83,6 +87,11 @@ class ActuatorAdapterManager(object):
 		leDisplayModule=import_module('programmingtheiot.cda.emulated.LedDisplayEmulatorTask','LedDisplayEmulatorTask')
 		leClazz=getattr(leDisplayModule,'LedDisplayEmulatorTask')
 		self.ledDisplayActuator=leClazz()
+
+		# create the alarm actuator emulator
+		alModule=import_module('programmingtheiot.cda.emulated.AlarmActuatorEmulatorTask','AlarmActuatorEmulatorTask')
+		alClazz=getattr(alModule,'AlarmActuatorEmulatorTask')
+		self.alarmAdapter=alClazz()
 	
 	def sendActuatorCommand(self, data: ActuatorData) -> ActuatorData:
 		if data and not data.isResponseFlagEnabled():
@@ -100,6 +109,8 @@ class ActuatorAdapterManager(object):
 					responseData = self.hvacActuator.updateActuator(data)
 				elif aType == ConfigConst.LED_DISPLAY_ACTUATOR_TYPE and self.ledDisplayActuator:
 					responseData = self.ledDisplayActuator.updateActuator(data)
+				elif aType == ConfigConst.ALARM_ACTUATOR_TYPE:
+					responseData = self.alarmAdapter.updateActuator(data)
 				else:
 					logging.warning("No valid actuator type. Ignoring actuation for type: %s", data.getTypeID())
 

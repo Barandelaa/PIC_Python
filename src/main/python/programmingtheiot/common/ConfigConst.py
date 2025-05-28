@@ -170,6 +170,12 @@ CPU_UTIL_NAME  = 'DeviceCpuUtil'
 DISK_UTIL_NAME = 'DeviceDiskUtil'
 MEM_UTIL_NAME  = 'DeviceMemUtil'
 
+LIGHT_SENSOR_TYPE = 1014
+LIGHT_SENSOR_NAME = 'LightSensor'
+
+ALARM_ACTUATOR_TYPE = 1003
+ALARM_ACTUATOR_NAME = 'AlarmActuator'
+
 #####
 # typical topic naming conventions
 #
